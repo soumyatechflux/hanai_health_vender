@@ -1,73 +1,77 @@
-import React, { Fragment, useState } from "react";
-import { Button, Table, Modal, Form } from "react-bootstrap";
+import React, { Fragment, useState, useEffect } from "react";
+import { Button, Table, Modal } from "react-bootstrap";
 import './bill.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FaFilePdf } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-import BillEmployeesData from "./BillEmployees";// Renamed to EmployeesData to avoid confusion
-import BillStatement from './BillStatement.pdf';
+import { BillReportAPI } from "../../../api"; 
 
 const Bill = () => {
-  const [Billemployees, setEmployees] = useState(BillEmployeesData);
+  const [Bill, setBill] = useState([]); 
   const [showEdit, setShowEdit] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
-  const [editData, setEditData] = useState({ id: "", Sr:"", billId: "", amount: "", createdAt: "" });
-  const [newData, setNewData] = useState({Sr:"", billId: "", amount: "", createdAt: "" });
+  const [showPdf, setShowPdf] = useState(false); // State to manage PDF modal
+  const [pdfUrl, setPdfUrl] = useState(''); // State to store PDF URL
+  const [editData, setEditData] = useState({ id: "", Sr: "", billId: "", amount: "", createdAt: "" });
+  const [newData, setNewData] = useState({ Sr: "", billId: "", amount: "", createdAt: "" });
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  let history = useNavigate();
-
-  // Edit Operation
-  // const handleEdit = (id, Sr, billId, amount, createdAt) => {
-  //   setEditData({ id, Sr, billId, amount, createdAt });
-  //   setShowEdit(true);
-  // };
-
-  // DELETE Operation
-  const handleDelete = (id) => {
-    setEmployees(Billemployees.filter((e) => e.id !== id));
-    history(" ");
+  const fetchBillReport = async () => {
+    try {
+      const response = await BillReportAPI();
+      if (!response?.data?.data?.bills) {
+        throw new Error("Invalid response structure");
+      }
+      setBill(response?.data?.data?.bills); 
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError("Failed to fetch data. Please try again.");
+    }
   };
 
-  // Handle modal close
+  useEffect(() => {
+    fetchBillReport();
+  }, []);
+  useEffect(() => {
+    fetchBillReport();
+  }, []);
+
   const handleCloseEdit = () => setShowEdit(false);
   const handleCloseCreate = () => setShowCreate(false);
 
-  // Handle modal save for edit
-  // const handleSaveEdit = () => {
-  //   setEmployees(
-  //     Billemployees.map((e) =>
-  //       e.id === editData.id ? { ...e, Sr: editData.Sr, BillId: editData.billId, amount: editData.amount, createdAt: editData.createdAt } : e
-  //     )
-  //   );
-  //   setShowEdit(false);
-  // };
-
-  // Handle modal save for create
   const handleSaveCreate = () => {
-    const newId = Billemployees.length ? Math.max(...Billemployees.map((e) => e.id)) + 1 : 1;
-    setEmployees([...Billemployees, { id: newId, Sr: newData.Sr, BillId: newData.billId, amount: newData.amount, createdAt: newData.createdAt }]);
+    const newId = Bill.length ? Math.max(...Bill.map((e) => e.id)) + 1 : 1; 
+    setBill([...Bill, { id: newId, Sr: newData.Sr, billId: newData.billId, amount: newData.amount, createdAt: newData.createdAt }]); 
     setShowCreate(false);
-    setNewData({Sr:"", billId: "", amount: "", createdAt: "" });
+    setNewData({ Sr: "", billId: "", amount: "", createdAt: "" });
   };
 
-  // Open Create Modal
   const handleCreate = () => setShowCreate(true);
+
+  const handleDelete = (id) => {
+    setBill(Bill.filter((e) => e.id !== id)); 
+  };
+
+  const handleShowPdf = (fileName) => {
+    const url = fileName ? `/pdfs/${fileName}` : '';
+    setPdfUrl(url);
+    setShowPdf(true);
+  };
 
   return (
     <Fragment>
-      <div className="container bill-main-container " style={{marginTop:'2.6%'}}>
-      <div className="d-flex align-items-center justify-content-between top-margin-heading">
-        <h1 className="text-class ">Bill Details </h1> 
+      <div className="container bill-main-container" style={{ marginTop: '2.6%' }}>
+        <div className="d-flex align-items-center justify-content-between top-margin-heading">
+          <h1 className="text-class">Bill Details</h1>
+        </div>
 
-        {/* Add button is   */}
-        <div className=" " style={{visibility:'hidden'}}>
-          <Button size="lg" onClick={handleCreate}>Add Bill</Button>
-        </div>
-        </div>
+        {error && <p className="text-danger">{error}</p>}
+
         <Table responsive striped bordered hover size="sm" className="table-resp">
           <thead>
             <tr>
-             <th className="col-1 col-md-1">Sr No</th>
+              <th className="col-1 col-md-1">Sr No</th>
               <th className="col-3 col-md-3">Bill Id</th>
               <th className="col-2 col-md-2">Amount</th>
               <th className="col-3 col-md-3">Bill Date</th>
@@ -75,154 +79,46 @@ const Bill = () => {
             </tr>
           </thead>
           <tbody>
-            {Billemployees && Billemployees.length > 0
-              ? Billemployees.map((item) => (
+            {Bill.length > 0
+              ? Bill.map((item, index) => (
                   <tr key={item.id}>
-                  <td style={{padding:'6px'}}>{item.Sr}</td>
-                    <td style={{padding:'6px'}}>{item.BillId}</td>
-                    <td style={{padding:'6px'}}>{item.amount}</td>
-                    <td style={{textWrap:'nowrap',padding:'6px'}}>{item.createdAt}</td>
-                    <td className="action-users" style={{padding:'6px'}}>
-                      {/* <Button size="sm" variant="success" onClick={() => handleEdit(item.id, item.BillId, item.amount, item.createdAt)}>
-                        Edit
-                      </Button>
-                      <Button size="sm" className="mx-2" variant="danger" onClick={() => handleDelete(item.id)}>
-                        Delete
-                      </Button> */}
-                      {/* <Button
-                          variant="link"
-                          onClick={() => handleEdit(item.id, item.Sr, item.BillId, item.amount, item.createdAt)}
-                        >
-                          <FaEdit />
-                        </Button> */}
-                        <a
-                      href={BillStatement}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <FaFilePdf style={{ color: 'red', fontSize:'20px', margin:'7px'}} />
-                    </a>
-                        
-
+                    <td style={{ padding: '6px' }}>{index + 1}</td> 
+                    <td style={{ padding: '6px' }}>{item.bill_id}</td>
+                    <td style={{ padding: '6px' }}>{item.amout}</td>
+                    <td style={{ textWrap: 'nowrap', padding: '6px' }}>{new Date(item.bill_date).toLocaleDateString()}</td>
+                    <td className="action-users" style={{ padding: '6px' }}>
+                      <a
+                        href="#"
+                        onClick={() => handleShowPdf(item.actions ? item.actions : '')}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <FaFilePdf style={{ color: 'red', fontSize: '20px', margin: '7px' }} />
+                      </a>
                     </td>
                   </tr>
                 ))
-              : <p className="mt-2">No data available</p>}
+              : <tr><td colSpan="5" className="text-center">No data available</td></tr>}
           </tbody>
         </Table>
         <br />
-        {/* <div className="d-grid gap-2" style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-          <Button size="lg" onClick={handleCreate}>Add Bill Details</Button>
-        </div> */}
+        <Modal show={showPdf} onHide={() => setShowPdf(false)} size="lg">
+          <Modal.Header closeButton>
+            <Modal.Title>PDF Viewer</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {pdfUrl ? (
+              <iframe
+                src={pdfUrl}
+                style={{ width: '100%', height: '600px' }}
+                frameBorder="0"
+              />
+            ) : (
+              <p>No PDF available</p>
+            )}
+          </Modal.Body>
+        </Modal>
+        {/* Add Create Modal and Edit Modal code here */}
       </div>
-
-      {/* Edit Modal */}
-      {/* <Modal show={showEdit} onHide={handleCloseEdit}>
-        <Modal.Header closeButton>
-          <Modal.Title>Edit Bill Details</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group className="mb-3" controlId="formNameEdit">
-            <Form.Label>Sr No</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Sr No"
-                value={editData.Sr}
-                onChange={(e) => setEditData({ ...editData, Sr: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formNameEdit">
-              <Form.Label>BillId</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Bill Id"
-                value={editData.billId}
-                onChange={(e) => setEditData({ ...editData, billId: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formLocationEdit">
-              <Form.Label>Amount</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Enter Bill Amount"
-                value={editData.amount}
-                onChange={(e) => setEditData({ ...editData, amount: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formCreatedAtEdit">
-              <Form.Label>Bill Date</Form.Label>
-              <Form.Control
-                type="date"
-                value={editData.createdAt}
-                onChange={(e) => setEditData({ ...editData, createdAt: e.target.value })}
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseEdit}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleSaveEdit}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal> */}
-
-      {/* Create Modal */}
-      {/* <Modal show={showCreate} onHide={handleCloseCreate}>
-        <Modal.Header closeButton>
-          <Modal.Title>Add Bill Details</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-          <Form.Group className="mb-3" controlId="formNameCreate">
-              <Form.Label>Sr No</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Enter Sr No"
-                value={newData.Sr}
-                onChange={(e) => setNewData({ ...newData, Sr: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formNameCreate">
-              <Form.Label>Bill Id</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Enter Bill Id"
-                value={newData.billId}
-                onChange={(e) => setNewData({ ...newData, billId: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formLocationCreate">
-              <Form.Label>Amount</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Enter Bill Amount"
-                value={newData.amount}
-                onChange={(e) => setNewData({ ...newData, amount: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formCreatedAtCreate">
-              <Form.Label>Bill Date</Form.Label>
-              <Form.Control
-                type="date"
-                value={newData.createdAt}
-                onChange={(e) => setNewData({ ...newData, createdAt: e.target.value })}
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseCreate}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleSaveCreate}>
-            Add Bill Details
-          </Button>
-        </Modal.Footer>
-      </Modal> */}
     </Fragment>
   );
 };

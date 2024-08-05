@@ -28,7 +28,7 @@ const Profile = () => {
 
   return (
     <div className="container-fluid Profile-Container">
-      <div className="row justify-content-center">
+      <div className="row justify-content-center " style={{ margin: '3%' }}>
         <div className="col-md-8 col-lg-6 profile-target">
           <div className="profilepage-container text-center position-relative">
             <div className="icon-form mb-4 position-relative">

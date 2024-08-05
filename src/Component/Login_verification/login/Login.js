@@ -1,50 +1,95 @@
 import React, { useState } from "react";
 import longlogo from "./longlogo.PNG";
 import "./login.css";
-import { useNavigate } from 'react-router-dom';
-// import ForgotPasswordFlow from './ForgotPasswordFlow';
+import { useNavigate } from "react-router-dom";
 import ForgotPasswordFlow from "./ForgotPassword/ForgotPassword";
+import SignUp from "../../SignUp/SignUp/SignUp.js";
+import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
+import { LoginAPI } from "../../../api.js";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
-  const [email, setEmail] = useState('hanaihealth@123.com');
-  const [password, setPassword] = useState('hanaihealth@123.com');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [showForgotPassword, setShowForgotPassword] = useState(false); // State for controlling modal visibility
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [showSignUpModal, setShowSignUpModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     let valid = true;
 
     if (!email) {
-      setEmailError('Email is required');
+      setEmailError("Email is required");
       valid = false;
     } else {
-      setEmailError('');
+      setEmailError("");
     }
 
     if (!password) {
-      setPasswordError('Password is required');
+      setPasswordError("Password is required");
       valid = false;
     } else {
-      setPasswordError('');
+      setPasswordError("");
     }
 
-    if (valid) {
-      navigate('/dashboard');
+    if (!valid) {
+      return;
+    }
+
+    // navigate('/verification', { state: { email: email } });
+
+    setIsLoading(true);
+
+    try {
+      const data = {
+        email: email,
+        password: password,
+      };
+
+      const response = await LoginAPI(data);
+
+      const responseData = response?.data;
+
+      if (responseData?.response === true) {
+        toast.success(responseData?.success_msg);
+        navigate("/verification", { state: { email: email } });
+      } else {
+        if (responseData?.error_msg) {
+          toast.error(responseData?.error_msg);
+        } else {
+          toast.error("An error occurred during login. Please try again.");
+        }
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      toast.error("An error occurred during login. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleForgotPassword = () => {
-    setShowForgotPassword(true); // Show the Forgot Password modal
+    setShowForgotPassword(true);
   };
 
+  const togglePasswordVisibility = () => {
+    setPasswordVisible((prevState) => !prevState);
+  };
+
+  const openSignUpModal = () => {
+    setShowSignUpModal(true);
+  };
   return (
     <div>
       <div className="container-fluid">
-        <div className="row ">
-          <div className="col-12 col-md-6 left-side" style={{ height: '100vh' }}>
+        <div className="row">
+          <div className="col-12 col-md-6 left-side">
             <img src={longlogo} alt="Henai Health" className="logo-img" />
           </div>
           <div className="col-12 col-md-6 right-side">
@@ -62,17 +107,28 @@ const Login = () => {
                     autoComplete="off"
                   />
                   {emailError && <div className="error">{emailError}</div>}
+                </div>
+                <div className="password-field">
                   <input
-                    type="password"
+                    type={passwordVisible ? "text" : "password"}
                     className="input-pass"
                     id="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     autoComplete="off"
+                    required
                   />
-                  {passwordError && <div className="error">{passwordError}</div>}
+                  <button
+                    type="button"
+                    className="toggle-password-visibility"
+                    onClick={togglePasswordVisibility}
+                  >
+                    {passwordVisible ? <IoEyeOffOutline /> : <IoEyeOutline />}
+                  </button>
                 </div>
+                {passwordError && <div className="error">{passwordError}</div>}
+                
                 <div className="para">
                   <span>
                     <button type="button" onClick={handleForgotPassword} className="forgot-password-link" style={{border:"none", color:"red",backgroundColor:'#eaeaea'}}>
@@ -81,11 +137,18 @@ const Login = () => {
                   </span>
                 </div>
                 <div className="input-submit">
-                  <button type="submit" className="submit">Login</button>
+                <button
+  type="submit"
+  className={`submit ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'}`}
+  disabled={isLoading}
+>
+  {isLoading ? 'Loading...' : 'Login'}
+</button>
+
                 </div>
                 <div className="login-sing">
                   <span>
-                    Don't have an account? <a href="/signup">Sign Up</a>
+                    Don't have an account? <button type="button" onClick={openSignUpModal} className="sign-btn">Sign Up</button>
                   </span>
                 </div>
               </form>
@@ -95,6 +158,13 @@ const Login = () => {
       </div>
       {showForgotPassword && (
         <ForgotPasswordFlow onClose={() => setShowForgotPassword(false)} />
+      )}
+      {showSignUpModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <SignUp onClose={() => setShowSignUpModal(false)} />
+          </div>
+        </div>
       )}
     </div>
   );

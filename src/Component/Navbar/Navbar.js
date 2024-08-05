@@ -37,9 +37,10 @@ const Navbar = () => {
 
   //when we want to click on logout and open the module and we click on yes button then it render on login page
   const handleLogoutConfirm = () => {
+    localStorage.clear()
     setShowLogoutModal(false);
-    console.log('User logged out');
-    navigate("/"); // Redirect to the login page
+    console.log('Vender logged out');
+    navigate("/"); 
   };
 
   return (

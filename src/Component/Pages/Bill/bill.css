@@ -2,7 +2,7 @@
     font-family: Arial, Helvetica, sans-serif;
  }
 .bill-main-container {
-    margin-left: 15%;
+    margin-left: 14%;
 }
 Button svg{
     font-size: 20px;
@@ -39,7 +39,7 @@ Button svg{
   
   @media screen and (min-width:481px) and (max-width: 767px) {
     .bill-main-container {
-      margin-left: 50px;
+      margin-left: 40px;
       /* max-width: 100%; */
       width: calc(100%-50px);
       /* overflow-y: scroll; */

@@ -6,7 +6,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100vh;
 }
 .logo-img{
     width: 90%;
@@ -57,4 +56,6 @@
 }
 .verify_info{
     font-size: 12px;
+    text-align: center;
+    
 }

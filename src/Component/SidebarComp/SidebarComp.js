@@ -20,8 +20,8 @@ const SidebarComp = () => {
           </Link>
 
           
-          <Link to="/user" className="no-underline">
-            <div className={`nav-option option1 ${location.pathname === '/user' ? 'active' : ''}`}>
+          <Link to="/Lab_Report" className="no-underline">
+            <div className={`nav-option option1 ${location.pathname === '/Lab_Report' ? 'active' : ''}`}>
               <FaUserCog />
               <h5 className='h5-sidebar'>Lab Report</h5>
             </div>
