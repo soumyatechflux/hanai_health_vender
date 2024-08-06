@@ -18,14 +18,16 @@ import Verification from "./Component/Login_verification/verification/Verificati
 import Lab_Report from "./Component/Pages/Lab_Report/Lab_Report";
 import SignUp from "./Component/SignUp/SignUp/SignUp";
 import ForgotPasswordFlow from "./Component/Login_verification/login/ForgotPassword/ForgotPassword";
+import Signup_Verification from "./Component/Signup otp verification/Verification";
+
 
 const MainLayout = ({ children }) => {
   const location = useLocation();
   const { pathname } = location;
 
   // Define the paths where Navbar and Sidebar should not be displayed
-  const hideNavAndSidebar = ["/", "/verification", "/signup"];
-  const hideSidebar = ["/profile", "/signup"];
+  const hideNavAndSidebar = ["/", "/verification", "/signup","/signup_verification"];
+  const hideSidebar = ["/profile", "/signup" ];
 
 
   return (
@@ -92,6 +94,7 @@ function App() {
             <Route path="/Lab_Report" element={<Lab_Report />} />
             <Route path="/bill" element={<Bill />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/signup_verification" element={<Signup_Verification />} />
             <Route path="/forgot_password" element={<ForgotPasswordFlow />} />
           </Routes>
         </MainLayout>

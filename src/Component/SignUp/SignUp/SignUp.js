@@ -11,15 +11,15 @@ const SignUp = ({ onClose }) => {
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  // const [name, setName] = useState("");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [show, setShow] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [location, setLocation] =useState(""); 
-  const [test, setTest] =useState(""); 
+  const [test, setTest] =useState("");
+  const [location, setLocation] =useState("");
 
   const handleClose = () => {
     setShow(false);
@@ -46,35 +46,34 @@ const SignUp = ({ onClose }) => {
     }
 
     setError("");
-    handleClose();
+    // handleClose();
+
+    // navigate('/signup_verification', { state: { email: email } });
+
 
     setIsLoading(true);
 
     try {
       const data = {
-        // firstName: firstName,
-        // lastName: lastName,
-        name:firstName + lastName ,
+        name:firstName + " " + lastName ,
         email: email,
         password: password,
-        // confirmPassword:confirmPassword,
         venue:location,
         test_type:test,
       };
 
       const response = await SignupAPI(data);
-
-      const responseData = response?.data?.response === true;
-
-      if (responseData && response?.status === 200 && response?.data?.success_msg === "Account Created Successfully" ) {
+      // console.log(response?.data?.response);
+      // return;
+      if (response?.data?.response === true) {
         setError("");
         // handleClose();
         toast.success("OTP sended to your mail.");
         navigate('/signup_verification', { state: { email: email } });
 
       } else {
-        if (responseData?.error_msg) {
-          toast.error(responseData.error_msg);
+        if (response?.data?.error_msg) {
+          toast.error(response?.data?.error_msg);
         } else {
           toast.error("An error occurred during login. Please try again.");
         }
@@ -151,8 +150,7 @@ const SignUp = ({ onClose }) => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formVenue">
+            </Form.Group><Form.Group className="mb-3" controlId="formVenue">
               <Form.Label>Venue</Form.Label>
               <Form.Control
                 type="text"

@@ -3,9 +3,9 @@ import longlogo from "./longlogo.PNG";
 import "./login.css";
 import { useNavigate } from "react-router-dom";
 import ForgotPasswordFlow from "./ForgotPassword/ForgotPassword";
-import SignUp from "../../SignUp/SignUp/SignUp.js";
+import SignUp from "../../SignUp/SignUp/SignUp";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
-import { LoginAPI } from "../../../api.js";
+import { LoginAPI } from "../../../api";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -54,14 +54,13 @@ const Login = () => {
 
       const response = await LoginAPI(data);
 
-      const responseData = response?.data;
 
-      if (responseData?.response === true) {
-        toast.success(responseData?.success_msg);
+      if (response?.data?.response === true ) {
+        toast.success(response?.data?.success_msg);
         navigate("/verification", { state: { email: email } });
       } else {
-        if (responseData?.error_msg) {
-          toast.error(responseData?.error_msg);
+        if (response?.data?.error_msg) {
+          toast.error(response?.data?.error_msg);
         } else {
           toast.error("An error occurred during login. Please try again.");
         }
@@ -85,6 +84,7 @@ const Login = () => {
   const openSignUpModal = () => {
     setShowSignUpModal(true);
   };
+
   return (
     <div>
       <div className="container-fluid">
@@ -128,27 +128,39 @@ const Login = () => {
                   </button>
                 </div>
                 {passwordError && <div className="error">{passwordError}</div>}
-                
+
                 <div className="para">
                   <span>
-                    <button type="button" onClick={handleForgotPassword} className="forgot-password-link" style={{border:"none", color:"red",backgroundColor:'#eaeaea'}}>
+                    <button
+                      type="button"
+                      onClick={handleForgotPassword}
+                      className="forgot-password-link"
+                      style={{
+                        border: "none",
+                        color: "red",
+                        backgroundColor: "#eaeaea",
+                      }}
+                    >
                       Forgot Password
                     </button>
                   </span>
                 </div>
                 <div className="input-submit">
-                <button
-  type="submit"
-  className={`submit ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'}`}
-  disabled={isLoading}
->
-  {isLoading ? 'Loading...' : 'Login'}
-</button>
-
+                  <button type="submit" className="submit" disabled={isLoading}>
+                    {" "}
+                    {isLoading ? "Logging in..." : "Login"}
+                  </button>
                 </div>
                 <div className="login-sing">
                   <span>
-                    Don't have an account? <button type="button" onClick={openSignUpModal} className="sign-btn">Sign Up</button>
+                    Don't have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={openSignUpModal}
+                      className="sign-btn"
+                    >
+                      Sign Up
+                    </button>
                   </span>
                 </div>
               </form>

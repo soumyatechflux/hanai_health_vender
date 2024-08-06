@@ -35,7 +35,7 @@ const SignupOTPVerification = () => {
         };
 
         const response = await SignUpOtpAPI(data);
-        if (response?.data && response?.data?.response === true) {
+        if (response?.data && response?.data?.response?.response === true) {
           const token = response?.data?.data?.token;
           const encryptedToken = encryptData(token);
 
@@ -49,7 +49,7 @@ const SignupOTPVerification = () => {
           toast.success("OTP verified successfully.");
 
           setError("");
-          navigate("/about");
+          navigate("/dashboard");
         } else {
           toast.error(
             response?.data?.error_msg ||
