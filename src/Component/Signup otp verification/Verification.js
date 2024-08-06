@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import longlogo from "./longlogo.PNG";
-import smalllogo from "./small.PNG";
+import longlogo from "../images/Etern logo.jpg";
+import smalllogo from "../images/Logo.png";
 import { useNavigate } from "react-router-dom";
 import "./verification.css";
 import { useLocation } from "react-router-dom";
