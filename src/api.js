@@ -38,7 +38,7 @@ export function authorizeMe() {
   const encryptedToken = localStorage.getItem("encryptedTokenForVendorOfHanaiHealth");
 
   const token = decryptData(encryptedToken);
-
+  // console.log("token", token);
   if (token && token !== null && token !== undefined) {
     axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   } else {

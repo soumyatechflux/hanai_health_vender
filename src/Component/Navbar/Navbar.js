@@ -14,8 +14,9 @@ const Navbar = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
-  const Menus = ["Profile", "Logout"];
-
+  // const Menus = ["Profile", "Logout"];
+  const Menus = [ "Logout"];
+  
   const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       setOpen(false);

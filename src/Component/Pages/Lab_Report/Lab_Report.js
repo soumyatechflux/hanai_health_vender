@@ -50,6 +50,7 @@ const Lab_Report = () => {
 
   useEffect(() => {
       fetchLabReport(); 
+      fetchLabReport();
     },[]); 
 
     
@@ -160,7 +161,7 @@ const Lab_Report = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="text-center">No data available</td>
+                <td colSpan="6" className="text-center">Loading...</td>
               </tr>
             )}
           </tbody>
@@ -175,10 +176,10 @@ const Lab_Report = () => {
         </Modal.Header>
         <Modal.Body>
           <div className="form-container">
-            <div className="form-group">
+            {/* <div className="form-group">
               <strong>Sr No:</strong>
               <span>{editData.id}</span>
-            </div>
+            </div> */}
             <div className="form-group">
               <strong>Test Name:</strong>
               <span>{editData.type}</span>

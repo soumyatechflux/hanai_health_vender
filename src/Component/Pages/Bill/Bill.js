@@ -4,7 +4,7 @@ import './bill.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FaFilePdf } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-import { BillReportAPI } from "../../../api"; 
+import { BillReportAPI } from "../../../api.js"; 
 
 const Bill = () => {
   const [Bill, setBill] = useState([]); 
@@ -19,21 +19,31 @@ const Bill = () => {
 
   const fetchBillReport = async () => {
     try {
+      const timer = setTimeout(async () => {
+      try {
+
       const response = await BillReportAPI();
       if (!response?.data?.data?.bills) {
         throw new Error("Invalid response structure");
       }
-      setBill(response?.data?.data?.bills); 
+      setBill(response?.data?.data?.bills);
+    } catch (apiError) {
+      console.error("Error fetching data:", apiError);
+      setError("Failed to fetch data. Please try again.");
+    }
+  }, 10); // 10
+
+  // Cleanup the timer if the component unmounts before the timeout completes
+  return () => clearTimeout(timer);
+
     } catch (error) {
       console.error("Error fetching data:", error);
-      setError("Failed to fetch data. Please try again.");
+      setError("An unexpected error occurred.");
     }
   };
 
   useEffect(() => {
     fetchBillReport();
-  }, []);
-  useEffect(() => {
     fetchBillReport();
   }, []);
 
@@ -53,8 +63,8 @@ const Bill = () => {
     setBill(Bill.filter((e) => e.id !== id)); 
   };
 
-  const handleShowPdf = (fileName) => {
-    const url = fileName ? `/pdfs/${fileName}` : '';
+  const handleShowPdf = () => {
+    const url =  '/pdfs/bill_details.pdf';
     setPdfUrl(url);
     setShowPdf(true);
   };
@@ -66,7 +76,7 @@ const Bill = () => {
           <h1 className="text-class">Bill Details</h1>
         </div>
 
-        {error && <p className="text-danger">{error}</p>}
+        {/* {error && <p className="text-danger">{error}</p>} */}
 
         <Table responsive striped bordered hover size="sm" className="table-resp">
           <thead>
@@ -84,7 +94,7 @@ const Bill = () => {
                   <tr key={item.id}>
                     <td style={{ padding: '6px' }}>{index + 1}</td> 
                     <td style={{ padding: '6px' }}>{item.bill_id}</td>
-                    <td style={{ padding: '6px' }}>{item.amout}</td>
+                    <td style={{ padding: '6px' }}>{item.amount}</td>
                     <td style={{ textWrap: 'nowrap', padding: '6px' }}>{new Date(item.bill_date).toLocaleDateString()}</td>
                     <td className="action-users" style={{ padding: '6px' }}>
                       <a
@@ -97,7 +107,7 @@ const Bill = () => {
                     </td>
                   </tr>
                 ))
-              : <tr><td colSpan="5" className="text-center">No data available</td></tr>}
+              : <tr><td colSpan="5" className="text-center">Loading...</td></tr>}
           </tbody>
         </Table>
         <br />

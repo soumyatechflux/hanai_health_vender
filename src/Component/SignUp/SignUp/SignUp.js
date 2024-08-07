@@ -68,7 +68,7 @@ const SignUp = ({ onClose }) => {
       if (response?.data?.response === true) {
         setError("");
         // handleClose();
-        toast.success("OTP sended to your mail.");
+        toast.success("OTP sent to your email.");
         navigate('/signup_verification', { state: { email: email } });
 
       } else {
