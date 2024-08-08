@@ -12,7 +12,6 @@ const Bill = () => {
   const [showCreate, setShowCreate] = useState(false);
   const [showPdf, setShowPdf] = useState(false); // State to manage PDF modal
   const [pdfUrl, setPdfUrl] = useState(''); // State to store PDF URL
-  const [editData, setEditData] = useState({ id: "", Sr: "", billId: "", amount: "", createdAt: "" });
   const [newData, setNewData] = useState({ Sr: "", billId: "", amount: "", createdAt: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -46,23 +45,6 @@ const Bill = () => {
     fetchBillReport();
     fetchBillReport();
   }, []);
-
-  const handleCloseEdit = () => setShowEdit(false);
-  const handleCloseCreate = () => setShowCreate(false);
-
-  const handleSaveCreate = () => {
-    const newId = Bill.length ? Math.max(...Bill.map((e) => e.id)) + 1 : 1; 
-    setBill([...Bill, { id: newId, Sr: newData.Sr, billId: newData.billId, amount: newData.amount, createdAt: newData.createdAt }]); 
-    setShowCreate(false);
-    setNewData({ Sr: "", billId: "", amount: "", createdAt: "" });
-  };
-
-  const handleCreate = () => setShowCreate(true);
-
-  const handleDelete = (id) => {
-    setBill(Bill.filter((e) => e.id !== id)); 
-  };
-
 
 
   const handleShowPdf = (url) => {
@@ -109,7 +91,7 @@ const Bill = () => {
                     </td>
                   </tr>
                 ))
-              : <tr><td colSpan="5" className="text-center">Loading...</td></tr>}
+              : <tr><td colSpan="5" className="text-center">No bills found !</td></tr>}
           </tbody>
         </Table>
         <br />

@@ -92,10 +92,12 @@ const SignupOTPVerification = ({onLogin}) => {
               </div>
               <div className="verify_heading">
                 <h2>Verify that it's you</h2>
-                <p>
+                {/* <p>
                   We sent a verification code to the email number attached to
                   your account
-                </p>
+                </p> */}
+                <p className="fw-bold text-danger">Your verification code is 123</p>
+
               </div>
               <form onSubmit={handleVerification}>
                 <div className="verify_code">
