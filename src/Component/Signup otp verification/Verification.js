@@ -66,7 +66,7 @@ const SignupOTPVerification = ({onLogin}) => {
         }
       } catch (error) {
         console.error("Error varifying OTP:", error);
-        toast.error("An error occurred while varifying OTP. Please try again.");
+        //toast.error("An error occurred while varifying OTP. Please try again.");
       } finally {
         setIsLoading(false);
       }

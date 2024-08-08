@@ -35,7 +35,7 @@ const Lab_Report = () => {
   //     }
   //   } catch (error) {
   //     console.error("Error fetching data:", error);
-  //     toast.error("Failed to fetch data. Please try again.");
+  //     //toast.error("Failed to fetch data. Please try again.");
   //   }
   // };
 
@@ -62,14 +62,14 @@ const Lab_Report = () => {
           }
         } catch (error) {
           console.error("Error fetching data:", error);
-          // toast.error("Failed to fetch data. Please try again.");
+          // //toast.error("Failed to fetch data. Please try again.");
         }
       }, 10); // 10 ms delay
 
       // Cleanup the timer if the component unmounts before the timeout completes
       return () => clearTimeout(timer);
     } catch (error) {
-      toast.error("An unexpected error occurred.");
+      //toast.error("An unexpected error occurred.");
     }
   };
 
@@ -98,7 +98,7 @@ const Lab_Report = () => {
     if (file && file.type === "application/pdf") {
       setEditData({ ...editData, pdf: file, file_path: URL.createObjectURL(file) });
     } else {
-      toast.error("Please select a valid PDF file.");
+      //toast.error("Please select a valid PDF file.");
     }
   };
 
@@ -110,7 +110,7 @@ const Lab_Report = () => {
     e.preventDefault();
 
     if (!editData.pdf) {
-      toast.error("Please select a PDF file.");
+      //toast.error("Please select a PDF file.");
       return;
     }
 
@@ -134,7 +134,7 @@ const Lab_Report = () => {
     } catch (error) {
       setLoading(false);
       console.error("Failed to upload file.", error);
-      toast.error("Failed to upload file.");
+      //toast.error("Failed to upload file.");
     }
   };
 

@@ -62,12 +62,12 @@ const Login = () => {
         if (response?.data?.error_msg) {
           toast.error(response?.data?.error_msg);
         } else {
-          toast.error("An error occurred during login. Please try again.");
+          //toast.error("An error occurred during login. Please try again.");
         }
       }
     } catch (error) {
       console.error("Login failed:", error);
-      toast.error("An error occurred during login. Please try again.");
+      //toast.error("An error occurred during login. Please try again.");
     } finally {
       setIsLoading(false);
     }

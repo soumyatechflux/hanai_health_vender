@@ -28,7 +28,7 @@ const EnterEmail = ({ show, handleClose ,onEmailSubmit}) => {
             }
         } catch (error) {
             console.error("Error sending OTP:", error);
-            toast.error("An error occurred while sending OTP. Please try again.");
+            //toast.error("An error occurred while sending OTP. Please try again.");
         } finally {
             setIsLoading(false);
         }

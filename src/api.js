@@ -26,7 +26,7 @@ axiosInstance.interceptors.response.use(
       error?.response?.data &&
       error?.response?.data?.message === "Expired token"
     ) {
-      toast.error("Time elapsed, Please log in again!");
+      //toast.error("Time elapsed, Please log in again!");
       console.log("Expired token error....");
       localStorage.clear();
       navigate("/");
