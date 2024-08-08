@@ -1,102 +1,145 @@
 import React, { Fragment, useState, useEffect } from "react";
-import { Button, Table, Modal } from "react-bootstrap";
+import { Button, Table, Modal, Spinner } from "react-bootstrap";
 import "./lab.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { LabReportAPI } from "../../../api";
+import { LabReportAPI, UploadPdfOfLabReport } from "../../../api";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Lab_Report = () => {
-
-  // const encryptedTokenForVendorOfHanaiHealth = localStorage.getItem("encryptedTokenForVendorOfHanaiHealth")
-
-  const [lab, setLab] = useState([]); 
-  const [showEdit, setShowEdit] = useState(false);
+  const [labReports, setLabReports] = useState([]);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [editData, setEditData] = useState({
     id: "",
+    customer_id: "",
     type: "",
     venue: "",
     date: "",
-    time: "",
+    time_slot: "",
+    file_path: "",
     pdf: null,
   });
-  const [error, setError] = useState(""); // To display errors
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  
+  // const fetchLabReport = async () => {
+  //   try {
+  //     const response = await LabReportAPI();
+  //     if (response?.data?.response === true) {
+  //       // Correct property name based on your API response
+  //       setLabReports(response?.data?.data?.labreports || []);
+  //     } else {
+  //       toast.error(response?.data?.error_msg || "Failed to fetch lab reports.");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //     toast.error("Failed to fetch data. Please try again.");
+  //   }
+  // };
+
+  // const token = localStorage.getItem("encryptedTokenForVendorOfHanaiHealth");
+  // useEffect(() => {
+  //   if (token) {
+  //     fetchLabReport();
+  //   }
+  // }, [token]); 
+
+
+
+
+  // Fetch lab reports with a delay
   const fetchLabReport = async () => {
     try {
-      // Introduce a timeout to simulate delay
       const timer = setTimeout(async () => {
         try {
           const response = await LabReportAPI();
-          const labReports = response?.data?.data?.labreports;
-          setLab(labReports); 
-        } catch (apiError) {
-          console.error("Error fetching data:", apiError);
-          setError("Failed to fetch data. Please try again.");
+          if (response?.data?.response === true) {
+            setLabReports(response?.data?.data?.labreports || []);
+          } else {
+            toast.error(response?.data?.error_msg || "Failed to fetch lab reports.");
+          }
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          // toast.error("Failed to fetch data. Please try again.");
         }
-      }, 10); // 10
+      }, 10); // 10 ms delay
 
       // Cleanup the timer if the component unmounts before the timeout completes
       return () => clearTimeout(timer);
-
     } catch (error) {
-      console.error("Unexpected error:", error);
-      setError("An unexpected error occurred.");
+      toast.error("An unexpected error occurred.");
     }
   };
-  
 
   useEffect(() => {
-      fetchLabReport(); 
-      fetchLabReport();
-    },[]); 
+    fetchLabReport();
+  }, []);
 
-    
-  // Edit Operation
-  const handleEdit = (id, type, venue, date, time, pdf) => {
-    setEditData({ id, type, venue, date, time, pdf: pdf ? new Blob([pdf], { type: "application/pdf" }) : null });
-    setShowEdit(true);
-  };
 
-  // Handle PDF Upload
-  const handlePdfUpload = (e) => {
-    setEditData({ ...editData, pdf: e.target.files[0] });
-  };
 
-  // Handle PDF Deselect
-  const handlePdfDeselect = () => {
-    setEditData({ ...editData, pdf: null });
-  };
-
-  // Handle modal close
-  const handleCloseEdit = () => setShowEdit(false);
-
-  // Handle Save Changes
-  const handleSave = async () => {
-    const { id, type, venue, date, time, pdf } = editData;
-    const payload = {
-      id,
-      type,
-      venue,
-      date,
-      time,
-      pdf: pdf ? await convertFileToBase64(pdf) : null,
-    };
-    // Add your save logic here
-    console.log("Saving data:", payload);
-    handleCloseEdit();
-  };
-
-  // Convert file to base64 (if needed for API call)
-  const convertFileToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+  const handleEdit = (report) => {
+    setEditData({
+      id: report.id,
+      customer_id: report.customer_id,
+      type: report.type,
+      venue: report.venue,
+      date: new Date(report.date).toLocaleDateString(),
+      time_slot: report.time_slot,
+      file_path: report.file_path,
+      pdf: null,
     });
+    setShowEditModal(true);
+  };
+
+  const handlePdfUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === "application/pdf") {
+      setEditData({ ...editData, pdf: file, file_path: URL.createObjectURL(file) });
+    } else {
+      toast.error("Please select a valid PDF file.");
+    }
+  };
+
+  const handlePdfDeselect = () => {
+    setEditData({ ...editData, pdf: null, file_path: "" });
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+
+    if (!editData.pdf) {
+      toast.error("Please select a PDF file.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("customer_id", editData.customer_id);
+    formData.append("id", editData.id);
+    formData.append("labReportPath", editData.pdf);
+
+    try {
+      setLoading(true);
+      const response = await UploadPdfOfLabReport(formData);
+      setLoading(false);
+
+      if (response.data.response === true) {
+        toast.success( response.data.success_msg || "File uploaded successfully.");
+        fetchLabReport();
+        setShowEditModal(false);
+      } else {
+        toast.error(response.data.error_msg || "Failed to upload file.");
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error("Failed to upload file.", error);
+      toast.error("Failed to upload file.");
+    }
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
   };
 
   return (
@@ -104,9 +147,10 @@ const Lab_Report = () => {
       <div className="container user-main-container" style={{ marginTop: "2.6%" }}>
         <div className="d-flex align-items-center justify-content-between top-margin-heading">
           <h1 className="text-class">Lab Report</h1>
-          {/* Add button is */}
           <div className="btn-class" style={{ visibility: "hidden" }}>
-            <Button size="lg" className="add-btn">Lab Report</Button>
+            <Button size="lg" className="add-btn">
+              Lab Report
+            </Button>
           </div>
         </div>
 
@@ -130,38 +174,30 @@ const Lab_Report = () => {
             </tr>
           </thead>
           <tbody>
-            {lab.length > 0 ? ( 
-              lab.map((item, index) => ( 
+            {labReports.length > 0 ? (
+              labReports.map((item, index) => (
                 <tr key={item.id}>
-                  <td>{index + 1}</td> 
-                  <td>{item.type}</td> 
-                  <td>{item.venue}</td> 
-                  <td>{new Date(item.date).toLocaleDateString()}</td> {/* Date */}
-                  <td>{item.time_slot}</td> {/* Time */}
+                  <td>{index + 1}</td>
+                  <td>{item.type}</td>
+                  <td>{item.venue}</td>
+                  <td>{new Date(item.date).toLocaleDateString()}</td>
+                  <td>{item.time_slot}</td>
                   <td className="action-users">
                     <Button
                       style={{ color: "#454545", width: "80px" }}
                       variant="link"
-                      onClick={() =>
-                        handleEdit(
-                          item.id, // Assuming Sr is item.id
-                          item.type, // Assuming Name is item.type
-                          item.venue, // Venue
-                          new Date(item.date).toLocaleDateString(), // Date
-                          item.time_slot, // Time
-                          item.pdf // PDF URL or Blob
-                        )
-                      }
+                      onClick={() => handleEdit(item)}
                     >
                       <FaEdit style={{ fontSize: "20px", margin: "2px" }} />
                     </Button>
-                    
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="text-center">Loading...</td>
+                <td colSpan="6" className="text-center">
+                  No Lab Reports Available
+                </td>
               </tr>
             )}
           </tbody>
@@ -169,17 +205,12 @@ const Lab_Report = () => {
         <br />
       </div>
 
-      {/* Edit Modal */}
-      <Modal show={showEdit} onHide={handleCloseEdit} centered>
+      <Modal show={showEditModal} onHide={handleCloseEditModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>View Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="form-container">
-            {/* <div className="form-group">
-              <strong>Sr No:</strong>
-              <span>{editData.id}</span>
-            </div> */}
             <div className="form-group">
               <strong>Test Name:</strong>
               <span>{editData.type}</span>
@@ -194,7 +225,7 @@ const Lab_Report = () => {
             </div>
             <div className="form-group">
               <strong>Time:</strong>
-              <span>{editData.time}</span>
+              <span>{editData.time_slot}</span>
             </div>
             <div className="form-group">
               <strong>PDF:</strong>
@@ -206,10 +237,10 @@ const Lab_Report = () => {
                   fontSize: "0.9em",
                 }}
               >
-                {editData.pdf ? (
+                {editData?.file_path ? (
                   <>
                     <iframe
-                      src={URL.createObjectURL(editData.pdf)}
+                      src={editData.file_path}
                       style={{
                         width: "100%",
                         height: "200px",
@@ -239,6 +270,7 @@ const Lab_Report = () => {
                 )}
               </div>
             </div>
+
             <div className="form-group">
               <input
                 type="file"
@@ -249,14 +281,15 @@ const Lab_Report = () => {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseEdit}>
+          <Button variant="secondary" onClick={handleCloseEditModal}>
             Close
           </Button>
           <Button
             style={{ backgroundColor: "red", color: "white", border: "none" }}
             onClick={handleSave}
+            disabled={loading}
           >
-            Save
+            {loading ? <Spinner animation="border" size="sm" /> : "Save"}
           </Button>
         </Modal.Footer>
       </Modal>

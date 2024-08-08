@@ -29,7 +29,7 @@ const Bill = () => {
       setBill(response?.data?.data?.bills);
     } catch (apiError) {
       console.error("Error fetching data:", apiError);
-      setError("Failed to fetch data. Please try again.");
+      // setError("Failed to fetch data. Please try again.");
     }
   }, 10); // 10
 

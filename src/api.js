@@ -135,6 +135,18 @@ export async function BillReportAPI() {
   }
 }
 
+
+export async function UploadPdfOfLabReport(formData){
+  try {
+    const response = await axiosInstance.post(`/vendor/uploadlabreport`,formData);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+
+
 // Example of the App component
 const App = () => {
   useEffect(() => {

@@ -7,9 +7,10 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import './navbar.css';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-
-const Navbar = () => {
+const Navbar = ({onLogout}) => {
   const [open, setOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const dropdownRef = useRef(null);
@@ -38,10 +39,18 @@ const Navbar = () => {
 
   //when we want to click on logout and open the module and we click on yes button then it render on login page
   const handleLogoutConfirm = () => {
-    localStorage.clear()
     setShowLogoutModal(false);
-    console.log('Vender logged out');
-    navigate("/"); 
+
+    localStorage.clear();
+    
+    onLogout();
+    if (onLogout) {
+      navigate("/");
+    }
+    navigate("/");
+
+    toast.success("Logged out successfully!");
+
   };
 
   return (

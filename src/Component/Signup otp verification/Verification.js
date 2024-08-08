@@ -9,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { SignUpOtpAPI } from "../../api";
 import { encryptData } from "../CRYPTO/crypto";
 
-const SignupOTPVerification = () => {
+const SignupOTPVerification = ({onLogin}) => {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -49,7 +49,15 @@ const SignupOTPVerification = () => {
           toast.success("OTP verified successfully.");
 
           setError("");
-          navigate("/dashboard");
+          // navigate("/dashboard");
+
+
+          onLogin && onLogin();
+          if (onLogin) {
+            navigate("/dashboard");
+          }
+
+
         } else {
           toast.error(
             response?.data?.error_msg ||
