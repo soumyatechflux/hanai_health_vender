@@ -63,12 +63,14 @@ const Bill = () => {
     setBill(Bill.filter((e) => e.id !== id)); 
   };
 
-  const handleShowPdf = () => {
-    const url =  '/pdfs/bill_details.pdf';
+
+
+  const handleShowPdf = (url) => {
     setPdfUrl(url);
     setShowPdf(true);
   };
 
+  
   return (
     <Fragment>
       <div className="container bill-main-container" style={{ marginTop: '2.6%' }}>
@@ -98,8 +100,8 @@ const Bill = () => {
                     <td style={{ textWrap: 'nowrap', padding: '6px' }}>{new Date(item.bill_date).toLocaleDateString()}</td>
                     <td className="action-users" style={{ padding: '6px' }}>
                       <a
-                        href="#"
-                        onClick={() => handleShowPdf(item.actions ? item.actions : '')}
+                    
+                        onClick={() => handleShowPdf(item?.actions ? item?.actions : '')}
                         style={{ cursor: 'pointer' }}
                       >
                         <FaFilePdf style={{ color: 'red', fontSize: '20px', margin: '7px' }} />
@@ -116,15 +118,19 @@ const Bill = () => {
             <Modal.Title>PDF Viewer</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            {pdfUrl ? (
-              <iframe
-                src={pdfUrl}
-                style={{ width: '100%', height: '600px' }}
-                frameBorder="0"
-              />
-            ) : (
-              <p>No PDF available</p>
-            )}
+          {pdfUrl ? (
+  <>
+    <iframe
+      src={pdfUrl}
+      style={{ width: '100%', height: '600px' }}
+      frameBorder="0"
+      title="PDF Viewer"
+    />
+  </>
+) : (
+  <p>No PDF available</p>
+)}
+
           </Modal.Body>
         </Modal>
         {/* Add Create Modal and Edit Modal code here */}

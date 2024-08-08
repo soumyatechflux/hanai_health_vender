@@ -239,6 +239,7 @@ const Lab_Report = () => {
               >
                 {editData?.file_path ? (
                   <>
+            
                     <iframe
                       src={editData.file_path}
                       style={{

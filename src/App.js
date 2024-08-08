@@ -62,6 +62,9 @@ function App() {
   const handleLogout = () => {
     setLoggedIn(false);
     // Optionally clear tokens or perform other cleanup here
+        // Optionally clear tokens or perform other cleanup here
+        localStorage.removeItem("isVendorLoggedIn");
+        localStorage.removeItem("encryptedTokenForVendorOfHanaiHealth");
   };
 
   const [isOffline, setIsOffline] = useState(false);
