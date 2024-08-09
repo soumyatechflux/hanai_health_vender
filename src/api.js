@@ -28,7 +28,9 @@ axiosInstance.interceptors.response.use(
     ) {
       //toast.error("Time elapsed, Please log in again!");
       console.log("Expired token error....");
-      localStorage.clear();
+      // localStorage.clear();
+      localStorage.removeItem("isVendorLoggedIn");
+      localStorage.removeItem("encryptedTokenForVendorOfHanaiHealth");
       navigate("/");
     }
     return Promise.reject(error);

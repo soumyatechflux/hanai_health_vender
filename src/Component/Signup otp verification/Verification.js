@@ -39,8 +39,8 @@ const SignupOTPVerification = ({onLogin}) => {
           const token = response?.data?.data?.token;
           const encryptedToken = encryptData(token);
 
-          localStorage.clear();
-          localStorage.setItem("isUserLoggedIn", true);
+          // localStorage.clear();
+          localStorage.setItem("isVendorLoggedIn", true);
           localStorage.setItem(
             "encryptedTokenForVendorOfHanaiHealth",
             encryptedToken
