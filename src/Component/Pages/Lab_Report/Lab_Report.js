@@ -56,7 +56,7 @@ const Lab_Report = () => {
         try {
           const response = await LabReportAPI();
           if (response?.data?.response === true) {
-            setLabReports(response?.data?.data?.labreports || []);
+            setLabReports(response?.data?.data?.labreports);
           } else {
             toast.error(response?.data?.error_msg || "Failed to fetch lab reports.");
           }
@@ -72,7 +72,7 @@ const Lab_Report = () => {
       return () => clearTimeout(timer);
     } catch (error) {
       console.error("Unexpected error:", error);
-      toast.error("An unexpected error occurred.");
+      // toast.error("An unexpected error occurred.");
       setLoading(false); // Ensure loading state is reset
     }
   };
