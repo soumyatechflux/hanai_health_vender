@@ -55,7 +55,7 @@ const Lab_Report = () => {
       const timer = setTimeout(async () => {
         try {
           const response = await LabReportAPI();
-          if (response?.data?.response === true) {
+          if (response?.data?.response === true && response?.data?.data?.labreports.length !== 0) {
             setLabReports(response?.data?.data?.labreports);
           } else {
             toast.error(response?.data?.error_msg || "Failed to fetch lab reports.");
