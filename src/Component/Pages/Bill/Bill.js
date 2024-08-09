@@ -20,10 +20,10 @@ const Bill = () => {
       const timer = setTimeout(async () => {
         try {
           const response = await BillReportAPI();
-          if (!response?.data?.data?.bills) {
-            throw new Error("Invalid response structure");
+          if (response?.data?.data?.bills.length !== 0 && response?.data?.response === true) {
+            setBill(response?.data?.data?.bills);
+
           }
-          setBill(response.data.data.bills);
         } catch (apiError) {
           console.error("Error fetching data:", apiError);
         } finally {
