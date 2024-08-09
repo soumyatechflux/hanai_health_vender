@@ -49,8 +49,8 @@ const Lab_Report = () => {
 
 
 
-  // Fetch lab reports with a delay
   const fetchLabReport = async () => {
+    setLoading(true);
     try {
       const timer = setTimeout(async () => {
         try {
@@ -62,22 +62,29 @@ const Lab_Report = () => {
           }
         } catch (error) {
           console.error("Error fetching data:", error);
-          // //toast.error("Failed to fetch data. Please try again.");
+          // toast.error("Failed to fetch data. Please try again.");
+        } finally {
+          setLoading(false);
         }
       }, 10); // 10 ms delay
 
       // Cleanup the timer if the component unmounts before the timeout completes
       return () => clearTimeout(timer);
     } catch (error) {
-      //toast.error("An unexpected error occurred.");
+      console.error("Unexpected error:", error);
+      toast.error("An unexpected error occurred.");
+      setLoading(false); // Ensure loading state is reset
     }
   };
 
   useEffect(() => {
     fetchLabReport();
+    
+    // Cleanup function for useEffect
+    return () => {
+      // Additional cleanup if necessary
+    };
   }, []);
-
-
 
   const handleEdit = (report) => {
     setEditData({
