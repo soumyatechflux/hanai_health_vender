@@ -22,14 +22,14 @@ const Bill = () => {
           const response = await BillReportAPI();
           if (response?.data?.data?.bills.length !== 0 && response?.data?.response === true) {
             setBill(response?.data?.data?.bills);
-
+return;
           }
         } catch (apiError) {
           console.error("Error fetching data:", apiError);
         } finally {
           // setLoading(false);
         }
-      }, 10); // 10 ms delay
+      }, 100); // 10 ms delay
 
       // Cleanup the timer if the component unmounts before the timeout completes
       return () => clearTimeout(timer);

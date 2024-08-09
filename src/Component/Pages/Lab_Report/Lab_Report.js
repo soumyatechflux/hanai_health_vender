@@ -57,8 +57,9 @@ const Lab_Report = () => {
           const response = await LabReportAPI();
           if (response?.data?.response === true && response?.data?.data?.labreports.length !== 0) {
             setLabReports(response?.data?.data?.labreports);
+            return;
           } else {
-            toast.error(response?.data?.error_msg || "Failed to fetch lab reports.");
+            // toast.error(response?.data?.error_msg || "Failed to fetch lab reports.");
           }
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -66,7 +67,7 @@ const Lab_Report = () => {
         } finally {
           setLoading(false);
         }
-      }, 10); // 10 ms delay
+      }, 100); // 10 ms delay
 
       // Cleanup the timer if the component unmounts before the timeout completes
       return () => clearTimeout(timer);
